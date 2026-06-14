@@ -423,27 +423,6 @@ body {
   color: white;
 }
 
-.btn-learning {
-  background-color: var(--accent-gold-bg);
-  color: var(--secondary-hover);
-  border: 1px solid var(--accent-gold);
-}
-.btn-practice {
-  background-color: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
-}
-.btn-exam {
-  background-color: #fdf2f8;
-  color: #be185d;
-  border: 1px solid #fbcfe8;
-}
-.btn-challenge {
-  background-color: var(--correct-bg);
-  color: var(--correct-color);
-  border: 1px solid var(--correct-color);
-}
-
 .icon-btn {
   background: none;
   border: none;

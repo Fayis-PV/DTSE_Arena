@@ -54,10 +54,6 @@
       <span class="nav-icon">🔍</span>
       <span class="nav-label">Global Search</span>
     </button>
-    <button class="nav-item" id="nav-settings" title="Backup & Restore">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label">Settings</span>
-    </button>
   </nav>
 
   <!-- Main View Area -->
@@ -69,6 +65,7 @@
         <div>
           <h1 class="welcome-title">Welcome back, Scholar!</h1>
           <p class="welcome-subtitle">Every mistake is an opportunity to learn. Let's make progress today.</p>
+          <button class="btn btn-secondary" style="margin-top: 16px; background-color: white; color: var(--primary-color);" onclick="ui.showView('view-sections')">Enter Learning Arena →</button>
         </div>
         <div class="badge-carousel-container">
           <div class="badge-header">Recent Achievements</div>
@@ -124,6 +121,13 @@
             <li class="empty-list-msg">No weak areas identified yet. Start practicing!</li>
           </ul>
         </div>
+
+        <!-- Management Panel -->
+        <div class="dashboard-card">
+          <h2>Profile Management</h2>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">This option permanently clears all points, streak records, and saved bookmarks from your browser local storage.</p>
+          <button class="btn btn-danger btn-full" id="dashboard-reset-btn">Clear All Profile Data</button>
+        </div>
       </div>
     </section>
 
@@ -159,12 +163,7 @@
           <h3>Fundamental Principles</h3>
           <p>Beginner concepts and terminology overview with detailed feedback.</p>
           <div class="part-status" id="part1-status">Status: Uncompleted</div>
-          <div class="mode-buttons-container">
-            <button class="btn btn-learning" onclick="app.startQuiz(1, 'learning')">Learning Mode</button>
-            <button class="btn btn-practice" onclick="app.startQuiz(1, 'practice')">Practice Mode</button>
-            <button class="btn btn-exam" onclick="app.startQuiz(1, 'exam')">Exam Mode</button>
-            <button class="btn btn-challenge" onclick="app.startQuiz(1, 'challenge')">Challenge Mode</button>
-          </div>
+          <button class="btn btn-primary btn-full" style="margin-top: 12px;" onclick="app.startQuiz(1, 'learning')">Start Arena</button>
         </div>
 
         <div class="part-card" id="part-2-card">
@@ -175,12 +174,7 @@
           <h3>Advanced Implementation</h3>
           <p>Complex formulations, analysis, and scenario-based exam questions.</p>
           <div class="part-status" id="part2-status">Status: Uncompleted</div>
-          <div class="mode-buttons-container">
-            <button class="btn btn-learning" onclick="app.startQuiz(2, 'learning')">Learning Mode</button>
-            <button class="btn btn-practice" onclick="app.startQuiz(2, 'practice')">Practice Mode</button>
-            <button class="btn btn-exam" onclick="app.startQuiz(2, 'exam')">Exam Mode</button>
-            <button class="btn btn-challenge" onclick="app.startQuiz(2, 'challenge')">Challenge Mode</button>
-          </div>
+          <button class="btn btn-primary btn-full" style="margin-top: 12px;" onclick="app.startQuiz(2, 'learning')">Start Arena</button>
         </div>
       </div>
     </section>
@@ -192,7 +186,6 @@
         <div class="quiz-header-meta">
           <span class="badge" id="quiz-meta-section">Section</span>
           <span class="badge" id="quiz-meta-part">Part</span>
-          <span class="badge badge-mode" id="quiz-meta-mode">Learning Mode</span>
         </div>
         <div class="quiz-header-right">
           <div id="quiz-timer" class="quiz-timer">00:00</div>
@@ -335,43 +328,6 @@
 
       <div class="search-results-list" id="search-results-output">
         <p class="empty-list-msg">Enter a keyword to start searching through sections.</p>
-      </div>
-    </section>
-
-    <!-- SETTINGS VIEW -->
-    <section id="view-settings" class="viewport-section">
-      <div class="section-title-wrapper">
-        <h1>Platform Settings</h1>
-        <p>Manage local data backup, audio preferences, and reset progress parameters.</p>
-      </div>
-
-      <div class="settings-container">
-        <div class="settings-card">
-          <h3>Sound Effects</h3>
-          <div class="setting-row">
-            <span>Play interactive sounds on correct/incorrect answers</span>
-            <label class="switch">
-              <input type="checkbox" id="settings-audio-toggle" checked>
-              <span class="slider-round"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="settings-card">
-          <h3>Progress Backup & Sync</h3>
-          <p>Export all streak stats, XP levels, and bookmarks into a text file or import one back.</p>
-          <div class="backup-actions">
-            <button class="btn btn-secondary" id="settings-export-btn">Export Profile Data</button>
-            <button class="btn btn-primary" id="settings-import-btn">Import Profile Data</button>
-            <input type="file" id="settings-file-picker" style="display:none;" accept=".json">
-          </div>
-        </div>
-
-        <div class="settings-card">
-          <h3 class="text-danger">Danger Zone</h3>
-          <p>This action permanently clears all user points, levels, bookmarks and streaks stored on this browser.</p>
-          <button class="btn btn-danger" id="settings-reset-btn">Reset All Arena Progress</button>
-        </div>
       </div>
     </section>
 

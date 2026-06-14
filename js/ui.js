@@ -99,28 +99,31 @@ const ui = {
 
     // Render Options
     optBox.innerHTML = '';
-    Object.keys(question.options).forEach(key => {
-      const text = question.options[key];
+    const isArray = Array.isArray(question.options);
+    const keys = isArray ? ['A', 'B', 'C', 'D'] : Object.keys(question.options);
+
+    keys.forEach((key, idx) => {
+      let text = isArray ? question.options[idx] : question.options[key];
+      if (!text) return;
+
+      // Clean prefix if array format already has "A)"
+      text = text.replace(/^[A-D]\)\s*/i, '');
+
       const btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.innerHTML = `<span class="option-letter">${key}</span> <span class="option-text">${text}</span>`;
       
       // Select logic
       btn.onclick = () => {
-        if (app.engine.mode === 'learning' && document.getElementById('explanation-panel').style.display === 'block') {
-          return; // Freeze answers once submitted in learning mode
+        if (document.getElementById('explanation-panel').style.display === 'block') {
+          return; // Freeze answers once submitted
         }
         document.querySelectorAll('.option-btn').forEach(o => o.classList.remove('selected'));
         btn.classList.add('selected');
         app.engine.selectOption(key);
         
-        if (app.engine.mode === 'learning') {
-          // In learning mode, submit immediately on click to keep engagement
-          app.submitCurrentAnswer();
-        } else {
-          // Other modes require click submit
-          document.getElementById('quiz-submit-btn').style.display = 'block';
-        }
+        // Immediately submit and show feedback for a smooth flow in all modes
+        app.submitCurrentAnswer();
       };
 
       optBox.appendChild(btn);
@@ -156,7 +159,8 @@ const ui = {
     status.textContent = isCorrect ? 'Correct' : 'Incorrect';
     status.className = `explain-status-badge ${isCorrect ? 'correct' : 'incorrect'}`;
 
-    document.getElementById('explain-why-correct').textContent = question.explanation.why_correct;
+    const exp = question.explanation || {};
+    document.getElementById('explain-why-correct').textContent = exp.why_correct || "The correct answer is Option " + correctOption + ".";
     
     // Highlight options
     document.querySelectorAll('.option-btn').forEach(btn => {
@@ -171,21 +175,29 @@ const ui = {
     // Populate incorrect rationales
     const wrongList = document.getElementById('explain-why-wrong-list');
     wrongList.innerHTML = '';
-    Object.keys(question.explanation.why_wrong).forEach(key => {
+    const whyWrongObj = exp.why_wrong || {};
+    Object.keys(whyWrongObj).forEach(key => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>Option ${key}:</strong> ${question.explanation.why_wrong[key]}`;
+      li.innerHTML = `<strong>Option ${key}:</strong> ${whyWrongObj[key]}`;
       wrongList.appendChild(li);
     });
 
-    document.getElementById('explain-concept').textContent = question.explanation.concept_summary;
-    document.getElementById('explain-exam-tips').textContent = question.explanation.exam_tips;
-    document.getElementById('explain-memory-hack').textContent = question.explanation.memory_hack;
+    // Fallback if empty
+    if (wrongList.children.length === 0) {
+      const li = document.createElement('li');
+      li.textContent = "Evaluate why correct answer is option " + correctOption + ".";
+      wrongList.appendChild(li);
+    }
+
+    document.getElementById('explain-concept').textContent = exp.concept_summary || "Review the general parameters related to this question.";
+    document.getElementById('explain-exam-tips').textContent = exp.exam_tips || "Read questions carefully before responding.";
+    document.getElementById('explain-memory-hack').textContent = exp.memory_hack || "No specific memory helper saved for this topic.";
 
     // Handle Smart Vocabulary Panel
     const vocabBox = document.getElementById('vocab-box-panel');
-    if (question.explanation.vocabulary) {
+    if (exp.vocabulary) {
       vocabBox.style.display = 'block';
-      const voc = question.explanation.vocabulary;
+      const voc = exp.vocabulary;
       const typeTag = document.getElementById('vocab-type');
       const vContent = document.getElementById('vocab-content');
       vContent.innerHTML = '';
@@ -204,9 +216,9 @@ const ui = {
         typeTag.textContent = 'Arabic Morphology';
         vContent.innerHTML = `
           <div class="vocab-item"><span class="vocab-label">Arabic Word</span><span class="vocab-val lang-arabic" style="font-size:1.2rem;">${voc.word}</span></div>
-          <div class="vocab-item"><span class="vocab-label">Root (أصل)</span><span class="vocab-val">${voc.root}</span></div>
-          <div class="vocab-item"><span class="vocab-label">Grammar</span><span class="vocab-val">${voc.grammar}</span></div>
-          <div class="vocab-item"><span class="vocab-label">Usage</span><span class="vocab-val">${voc.usage}</span></div>
+          <div class="vocab-item"><span class="vocab-label">Root (أصل)</span><span class="vocab-val">${voc.root || ''}</span></div>
+          <div class="vocab-item"><span class="vocab-label">Grammar</span><span class="vocab-val">${voc.grammar || ''}</span></div>
+          <div class="vocab-item"><span class="vocab-label">Usage</span><span class="vocab-val">${voc.usage || ''}</span></div>
         `;
       }
     } else {

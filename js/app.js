@@ -151,10 +151,6 @@ class AppOrchestrator {
     const sec = SECTIONS.find(s => s.id === this.activeSectionId);
     document.getElementById('quiz-meta-section').textContent = sec ? sec.subject : '';
     document.getElementById('quiz-meta-part').textContent = `Part ${partId}`;
-    
-    const modeBadge = document.getElementById('quiz-meta-mode');
-    modeBadge.textContent = mode.toUpperCase() + ' MODE';
-    modeBadge.className = `badge badge-mode btn-${mode}`;
 
     ui.showView('view-quiz');
     this.loadCurrentQuestion();
@@ -190,19 +186,26 @@ class AppOrchestrator {
       ui.playFailureSound();
     }
 
-    if (this.engine.mode === 'learning') {
-      // Immediately reveal rationales
-      const q = this.engine.getCurrentQuestion();
-      ui.showRationales(q, this.engine.selectedAnswer, q.answer);
-      document.getElementById('quiz-submit-btn').style.display = 'none';
-      document.getElementById('quiz-next-btn').style.display = 'block';
-    } else {
-      // In practice/exam, save and proceed without instant explanations
-      this.nextQuestion();
-    }
+    // Reveal rationales immediately for ALL modes so students can evaluate
+    const q = this.engine.getCurrentQuestion();
+    ui.showRationales(q, this.engine.selectedAnswer, q.answer);
+    
+    // Freeze options so they can't change it after submitting
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.disabled = true;
+    });
+
+    document.getElementById('quiz-submit-btn').style.display = 'none';
+    document.getElementById('quiz-next-btn').textContent = "Next";
+    document.getElementById('quiz-next-btn').style.display = 'block';
   }
 
   nextQuestion() {
+    // Re-enable options for the next question card
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.disabled = false;
+    });
+
     if (this.engine.currentIndex < this.engine.questions.length - 1) {
       this.engine.currentIndex++;
       this.engine.selectedAnswer = null;
@@ -362,11 +365,6 @@ class AppOrchestrator {
       ui.showView('view-revision');
     };
     document.getElementById('nav-search').onclick = () => ui.showView('view-search');
-    document.getElementById('nav-settings').onclick = () => {
-      const profile = storage.getProfile();
-      document.getElementById('settings-audio-toggle').checked = profile.settings.audioEnabled;
-      ui.showView('view-settings');
-    };
 
     // Submits or goes next
     document.getElementById('quiz-submit-btn').onclick = () => this.submitCurrentAnswer();
@@ -408,15 +406,8 @@ class AppOrchestrator {
       this.handleSearch(e.target.value);
     };
 
-    // Settings adjustments
-    document.getElementById('settings-audio-toggle').onchange = (e) => {
-      const profile = storage.getProfile();
-      profile.settings.audioEnabled = e.target.checked;
-      storage.saveProfile(profile);
-    };
-
     // Reset button
-    document.getElementById('settings-reset-btn').onclick = () => {
+    document.getElementById('dashboard-reset-btn').onclick = () => {
       if (confirm("🚨 WARNING: Are you completely sure you want to reset all your progress, XP, and bookmarks? This action is irreversible.")) {
         storage.resetProgress();
         ui.renderProfileStats();
@@ -425,41 +416,6 @@ class AppOrchestrator {
         alert("Progress reset successful!");
         ui.showView('view-dashboard');
       }
-    };
-
-    // Profile Backup Export
-    document.getElementById('settings-export-btn').onclick = () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(storage.getProfile(), null, 2));
-      const dlAnchorElem = document.createElement('a');
-      dlAnchorElem.setAttribute("href", dataStr);
-      dlAnchorElem.setAttribute("download", `dtse_arena_profile_${Date.now()}.json`);
-      dlAnchorElem.click();
-    };
-
-    // Profile Backup Import
-    const picker = document.getElementById('settings-file-picker');
-    document.getElementById('settings-import-btn').onclick = () => picker.click();
-    picker.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const profile = JSON.parse(event.target.result);
-          if (profile.xp !== undefined && profile.completedQuestions) {
-            storage.saveProfile(profile);
-            ui.renderProfileStats();
-            this.updateDashboardAnalytics();
-            this.updateSectionOverviewPercentages();
-            alert("Profile profile successfully synced!");
-          } else {
-            alert("Invalid profile file format detected.");
-          }
-        } catch (err) {
-          alert("Error parsing JSON configuration.");
-        }
-      };
-      reader.readAsText(file);
     };
   }
 }
