@@ -41,8 +41,11 @@ class AppOrchestrator {
   async preloadAllData() {
     const fetchPromises = [];
     for (let secId = 1; secId <= 5; secId++) {
-      for (let partId = 1; partId <= 2; partId++) {
+      const maxParts = secId === 5 ? 3 : 2;
+      for (let partId = 1; partId <= maxParts; partId++) {
         const path = `sections/section${secId}_part${partId}.json`;
+        const currentSecId = secId;
+        const currentPartId = partId;
         fetchPromises.push(
           fetch(path)
             .then(res => {
@@ -50,11 +53,11 @@ class AppOrchestrator {
               return res.json();
             })
             .then(data => {
-              // Append tags
+              // Append tags using block scoped variables
               const questions = data.map(q => ({
                 ...q,
-                sectionId: secId,
-                partId: partId
+                sectionId: currentSecId,
+                partId: currentPartId
               }));
               this.allQuestions.push(...questions);
             })
@@ -123,17 +126,29 @@ class AppOrchestrator {
     // Count questions for parts
     const p1Count = this.allQuestions.filter(q => q.sectionId === sectionId && q.partId === 1).length;
     const p2Count = this.allQuestions.filter(q => q.sectionId === sectionId && q.partId === 2).length;
+    const p3Count = this.allQuestions.filter(q => q.sectionId === sectionId && q.partId === 3).length;
 
     document.getElementById('part1-qcount').textContent = `${p1Count} Questions`;
     document.getElementById('part2-qcount').textContent = `${p2Count} Questions`;
+    document.getElementById('part3-qcount').textContent = `${p3Count} Questions`;
 
     // Completion Status Indicators
     const profile = storage.getProfile();
     const p1Completed = this.allQuestions.filter(q => q.sectionId === sectionId && q.partId === 1 && profile.completedQuestions[q.id]);
     const p2Completed = this.allQuestions.filter(q => q.sectionId === sectionId && q.partId === 2 && profile.completedQuestions[q.id]);
+    const p3Completed = this.allQuestions.filter(q => q.sectionId === sectionId && q.partId === 3 && profile.completedQuestions[q.id]);
 
     document.getElementById('part1-status').textContent = `Completed: ${p1Completed.length} / ${p1Count}`;
     document.getElementById('part2-status').textContent = `Completed: ${p2Completed.length} / ${p2Count}`;
+    document.getElementById('part3-status').textContent = `Completed: ${p3Completed.length} / ${p3Count}`;
+
+    // Render Part 3 for Section 5 only
+    const part3Card = document.getElementById('part-3-card');
+    if (sectionId === 5) {
+      part3Card.style.display = 'flex';
+    } else {
+      part3Card.style.display = 'none';
+    }
 
     ui.showView('view-parts');
   }
@@ -147,6 +162,12 @@ class AppOrchestrator {
     
     this.engine.initSession(list, mode, this.activeSectionId, partId);
     
+    // Load Checkpoint
+    const checkpointIdx = storage.getCheckpoint(this.activeSectionId, partId);
+    if (checkpointIdx > 0 && checkpointIdx < list.length) {
+      this.engine.currentIndex = checkpointIdx;
+    }
+
     // Update Meta views
     const sec = SECTIONS.find(s => s.id === this.activeSectionId);
     document.getElementById('quiz-meta-section').textContent = sec ? sec.subject : '';
@@ -209,6 +230,10 @@ class AppOrchestrator {
     if (this.engine.currentIndex < this.engine.questions.length - 1) {
       this.engine.currentIndex++;
       this.engine.selectedAnswer = null;
+      
+      // Save checkpoint state
+      storage.saveCheckpoint(this.activeSectionId, this.engine.partId, this.engine.currentIndex);
+
       this.loadCurrentQuestion();
     } else {
       this.finishQuizSession();
@@ -218,6 +243,9 @@ class AppOrchestrator {
   finishQuizSession() {
     this.engine.stopTimer();
     const score = this.engine.calculateSessionScore();
+    
+    // Clear checkpoint state since session completed
+    storage.clearCheckpoint(this.activeSectionId, this.engine.partId);
     
     // Trigger streak calculation daily
     storage.updateStreak();

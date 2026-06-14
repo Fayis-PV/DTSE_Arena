@@ -14,6 +14,7 @@ const INITIAL_PROFILE = {
   completedQuestions: {}, // ID: { timestamp, correct }
   incorrectAttempts: {}, // ID: count
   difficultMarks: [], // array of question IDs
+  checkpoints: {}, // "sec_part": questionIndex
   settings: {
     audioEnabled: true,
     theme: 'light'
@@ -172,6 +173,26 @@ const storage = {
     }
     
     return newlyUnlocked;
+  },
+
+  saveCheckpoint(sectionId, partId, index) {
+    const profile = this.getProfile();
+    const key = `${sectionId}_${partId}`;
+    profile.checkpoints[key] = index;
+    this.saveProfile(profile);
+  },
+
+  getCheckpoint(sectionId, partId) {
+    const profile = this.getProfile();
+    const key = `${sectionId}_${partId}`;
+    return profile.checkpoints[key] !== undefined ? profile.checkpoints[key] : 0;
+  },
+
+  clearCheckpoint(sectionId, partId) {
+    const profile = this.getProfile();
+    const key = `${sectionId}_${partId}`;
+    delete profile.checkpoints[key];
+    this.saveProfile(profile);
   },
 
   resetProgress() {
