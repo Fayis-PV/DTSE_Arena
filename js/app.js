@@ -191,6 +191,9 @@ class AppOrchestrator {
     } else {
       prevBtn.style.display = 'none';
     }
+
+    // Reset Skip button visibility for the new question
+    document.getElementById('quiz-skip-btn').style.display = 'block';
   }
 
   submitCurrentAnswer() {
@@ -217,8 +220,29 @@ class AppOrchestrator {
     });
 
     document.getElementById('quiz-submit-btn').style.display = 'none';
+    document.getElementById('quiz-skip-btn').style.display = 'none';
     document.getElementById('quiz-next-btn').textContent = "Next";
     document.getElementById('quiz-next-btn').style.display = 'block';
+  }
+
+  skipQuestion() {
+    // Record as skipped or just proceed to the next question
+    // To preserve user options status
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.disabled = false;
+    });
+
+    // We can record it in sessionAnswers as null or "skipped"
+    this.engine.sessionAnswers[this.engine.currentIndex] = null;
+
+    if (this.engine.currentIndex < this.engine.questions.length - 1) {
+      this.engine.currentIndex++;
+      this.engine.selectedAnswer = null;
+      storage.saveCheckpoint(this.activeSectionId, this.engine.partId, this.engine.currentIndex);
+      this.loadCurrentQuestion();
+    } else {
+      this.finishQuizSession();
+    }
   }
 
   nextQuestion() {
@@ -397,6 +421,7 @@ class AppOrchestrator {
     // Submits or goes next
     document.getElementById('quiz-submit-btn').onclick = () => this.submitCurrentAnswer();
     document.getElementById('quiz-next-btn').onclick = () => this.nextQuestion();
+    document.getElementById('quiz-skip-btn').onclick = () => this.skipQuestion();
     document.getElementById('quiz-prev-btn').onclick = () => {
       if (this.engine.currentIndex > 0) {
         this.engine.currentIndex--;
