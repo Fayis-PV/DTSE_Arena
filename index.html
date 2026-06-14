@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DTSE Smart Learning Arena</title>
+  <meta name="description" content="An interactive multilingual learning arena for competitive exams, teaching students how and why.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600&family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="theme-light">
+
+  <!-- Floating Stats Banner -->
+  <header class="app-header">
+    <div class="header-logo" id="logo-btn">
+      <span class="logo-shield">🕌</span>
+      <span class="logo-text">DTSE <span class="logo-highlight">Arena</span></span>
+    </div>
+    
+    <div class="user-stats-bar">
+      <div class="stat-badge" title="Learning Streak">
+        <span class="stat-icon">🔥</span>
+        <span id="header-streak">0 Days</span>
+      </div>
+      <div class="stat-badge" title="Total Experience Points">
+        <span class="stat-icon">✨</span>
+        <span id="header-xp">0 XP</span>
+      </div>
+      <div class="stat-badge level-badge" title="User Level">
+        <span class="stat-icon">🏆</span>
+        <span id="header-level">Lv 1</span>
+      </div>
+      <button class="icon-btn" id="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">🌓</button>
+    </div>
+  </header>
+
+  <!-- Sidebar Navigation -->
+  <nav class="app-sidebar">
+    <button class="nav-item active" id="nav-home" title="Dashboard">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-item" id="nav-sections" title="Learn & Practice">
+      <span class="nav-icon">📚</span>
+      <span class="nav-label">Arena Sections</span>
+    </button>
+    <button class="nav-item" id="nav-revision" title="Revision Hub">
+      <span class="nav-icon">🔄</span>
+      <span class="nav-label">Revision Hub</span>
+    </button>
+    <button class="nav-item" id="nav-search" title="Search Questions">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-label">Global Search</span>
+    </button>
+    <button class="nav-item" id="nav-settings" title="Backup & Restore">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Settings</span>
+    </button>
+  </nav>
+
+  <!-- Main View Area -->
+  <main class="app-viewport">
+    
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="viewport-section active">
+      <div class="welcome-banner">
+        <div>
+          <h1 class="welcome-title">Welcome back, Scholar!</h1>
+          <p class="welcome-subtitle">Every mistake is an opportunity to learn. Let's make progress today.</p>
+        </div>
+        <div class="badge-carousel-container">
+          <div class="badge-header">Recent Achievements</div>
+          <div class="badge-mini-grid" id="dashboard-badges">
+            <!-- Badges populated by storage.js -->
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Analytics Overview -->
+        <div class="dashboard-card card-large">
+          <h2>Learning Analytics</h2>
+          <div class="analytics-metrics">
+            <div class="metric-box">
+              <span class="metric-value" id="stat-total-q">0</span>
+              <span class="metric-label">Answered</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-value" id="stat-accuracy">0%</span>
+              <span class="metric-label">Avg Accuracy</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-value" id="stat-speed">0s</span>
+              <span class="metric-label">Response Speed</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-value" id="stat-correct">0</span>
+              <span class="metric-label">Correct</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weekly Activity Plot / Simple Bar Representation -->
+        <div class="dashboard-card">
+          <h2>Study Schedule</h2>
+          <div class="activity-bars" id="activity-chart">
+            <!-- Simulated activity bars for visual styling -->
+            <div class="day-bar-wrapper"><div class="day-bar" style="height: 20%;"></div><span>M</span></div>
+            <div class="day-bar-wrapper"><div class="day-bar" style="height: 45%;"></div><span>T</span></div>
+            <div class="day-bar-wrapper"><div class="day-bar" style="height: 80%;"></div><span>W</span></div>
+            <div class="day-bar-wrapper"><div class="day-bar" style="height: 10%;"></div><span>T</span></div>
+            <div class="day-bar-wrapper"><div class="day-bar" style="height: 60%;"></div><span>F</span></div>
+            <div class="day-bar-wrapper"><div class="day-bar" style="height: 90%;"></div><span>S</span></div>
+            <div class="day-bar-wrapper"><div class="day-bar" style="height: 0%;" id="activity-today"></div><span>S</span></div>
+          </div>
+        </div>
+
+        <!-- Weak Areas Analysis -->
+        <div class="dashboard-card">
+          <h2>Weak Topics Needing Review</h2>
+          <ul class="weak-topics-list" id="dashboard-weak-topics">
+            <li class="empty-list-msg">No weak areas identified yet. Start practicing!</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTIONS VIEW -->
+    <section id="view-sections" class="viewport-section">
+      <div class="section-title-wrapper">
+        <h1>Select Subject Section</h1>
+        <p>Pick a domain to start learning and preparing for the examination.</p>
+      </div>
+
+      <div class="sections-grid" id="sections-container">
+        <!-- Section cards will be inserted dynamically by ui.js -->
+      </div>
+    </section>
+
+    <!-- PART VIEW -->
+    <section id="view-parts" class="viewport-section">
+      <div class="breadcrumb-nav">
+        <button class="text-btn" id="parts-back-btn">← Back to Sections</button>
+      </div>
+      <div class="section-title-wrapper">
+        <h1 id="selected-section-title">Section Name</h1>
+        <p>Choose Part 1 or Part 2 and select a mode to test your understanding.</p>
+      </div>
+
+      <div class="parts-grid" id="parts-container">
+        <!-- Part Cards -->
+        <div class="part-card" id="part-1-card">
+          <div class="part-meta">
+            <span class="part-tag">Part 1</span>
+            <span class="q-count" id="part1-qcount">Questions Loading...</span>
+          </div>
+          <h3>Fundamental Principles</h3>
+          <p>Beginner concepts and terminology overview with detailed feedback.</p>
+          <div class="part-status" id="part1-status">Status: Uncompleted</div>
+          <div class="mode-buttons-container">
+            <button class="btn btn-learning" onclick="app.startQuiz(1, 'learning')">Learning Mode</button>
+            <button class="btn btn-practice" onclick="app.startQuiz(1, 'practice')">Practice Mode</button>
+            <button class="btn btn-exam" onclick="app.startQuiz(1, 'exam')">Exam Mode</button>
+            <button class="btn btn-challenge" onclick="app.startQuiz(1, 'challenge')">Challenge Mode</button>
+          </div>
+        </div>
+
+        <div class="part-card" id="part-2-card">
+          <div class="part-meta">
+            <span class="part-tag">Part 2</span>
+            <span class="q-count" id="part2-qcount">Questions Loading...</span>
+          </div>
+          <h3>Advanced Implementation</h3>
+          <p>Complex formulations, analysis, and scenario-based exam questions.</p>
+          <div class="part-status" id="part2-status">Status: Uncompleted</div>
+          <div class="mode-buttons-container">
+            <button class="btn btn-learning" onclick="app.startQuiz(2, 'learning')">Learning Mode</button>
+            <button class="btn btn-practice" onclick="app.startQuiz(2, 'practice')">Practice Mode</button>
+            <button class="btn btn-exam" onclick="app.startQuiz(2, 'exam')">Exam Mode</button>
+            <button class="btn btn-challenge" onclick="app.startQuiz(2, 'challenge')">Challenge Mode</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ INTERFACE VIEW -->
+    <section id="view-quiz" class="viewport-section">
+      <!-- Quiz Header -->
+      <div class="quiz-interface-header">
+        <div class="quiz-header-meta">
+          <span class="badge" id="quiz-meta-section">Section</span>
+          <span class="badge" id="quiz-meta-part">Part</span>
+          <span class="badge badge-mode" id="quiz-meta-mode">Learning Mode</span>
+        </div>
+        <div class="quiz-header-right">
+          <div id="quiz-timer" class="quiz-timer">00:00</div>
+          <button class="btn btn-danger btn-sm" id="quiz-exit-btn">Exit Arena</button>
+        </div>
+      </div>
+
+      <!-- Progress Indicators -->
+      <div class="quiz-progress-container">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="quiz-progress-fill"></div>
+        </div>
+        <div class="progress-labels">
+          <span id="quiz-q-index">Question 1 of 10</span>
+          <span id="quiz-streak-combo"></span>
+        </div>
+      </div>
+
+      <!-- Core Question Component -->
+      <div class="question-container" id="question-arena-container">
+        <div class="question-header">
+          <span class="diff-indicator" id="question-difficulty">Easy</span>
+          <div class="question-actions">
+            <button class="icon-btn-text" id="bookmark-btn" title="Bookmark Question">⭐ Bookmark</button>
+          </div>
+        </div>
+
+        <div class="question-text-wrapper" id="question-text-box">
+          <!-- Text rendered automatically here -->
+        </div>
+
+        <!-- Options Container -->
+        <div class="options-layout" id="options-box">
+          <!-- Dynamic large buttons A, B, C, D -->
+        </div>
+
+        <!-- Actions panel -->
+        <div class="quiz-action-bar">
+          <button class="btn btn-secondary" id="quiz-prev-btn" style="display:none;">Previous</button>
+          <button class="btn btn-primary" id="quiz-submit-btn" style="display:none;">Submit Answer</button>
+          <button class="btn btn-primary" id="quiz-next-btn" style="display:none;">Next Question →</button>
+        </div>
+      </div>
+
+      <!-- Explanation & Concept Panels (Fades in dynamically) -->
+      <div class="explanation-viewport" id="explanation-panel" style="display:none;">
+        <div class="explain-heading">
+          <span class="explain-status-badge" id="explain-status">Correct</span>
+          <h2>Mastery Explanation</h2>
+        </div>
+
+        <div class="explain-card explain-correct-why">
+          <h3>Correct Answer Rationale</h3>
+          <p id="explain-why-correct"></p>
+        </div>
+
+        <div class="explain-grid">
+          <div class="explain-card">
+            <h3>Why other options are wrong</h3>
+            <ul id="explain-why-wrong-list"></ul>
+          </div>
+          <div class="explain-card">
+            <h3>Concept Summary</h3>
+            <p id="explain-concept"></p>
+          </div>
+        </div>
+
+        <!-- Smart Vocabulary Box -->
+        <div class="explain-card vocab-box" id="vocab-box-panel" style="display:none;">
+          <div class="vocab-header">
+            <h3>Smart Vocabulary Mastery</h3>
+            <span class="vocab-tag" id="vocab-type">Arabic Word</span>
+          </div>
+          <div class="vocab-grid" id="vocab-content">
+            <!-- Dynamic variables based on English / Arabic language profiles -->
+          </div>
+        </div>
+
+        <div class="explain-grid">
+          <div class="explain-card">
+            <h3>Exam Practice Advice</h3>
+            <p id="explain-exam-tips"></p>
+          </div>
+          <div class="explain-card">
+            <h3>Memory Hack</h3>
+            <p id="explain-memory-hack"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVISION HUB -->
+    <section id="view-revision" class="viewport-section">
+      <div class="section-title-wrapper">
+        <h1>Revision Hub</h1>
+        <p>Targeted revision packs based on your study habits and areas of difficulty.</p>
+      </div>
+
+      <div class="revision-packs-grid">
+        <div class="revision-card" onclick="app.startRevision('bookmarks')">
+          <div class="revision-icon">⭐</div>
+          <h3>Bookmarked Questions</h3>
+          <p id="rev-count-bookmarks">0 Questions Saved</p>
+          <button class="btn btn-secondary btn-full">Review Now</button>
+        </div>
+
+        <div class="revision-card" onclick="app.startRevision('errors')">
+          <div class="revision-icon">❌</div>
+          <h3>Most Repeated Mistakes</h3>
+          <p id="rev-count-errors">0 Questions Saved</p>
+          <button class="btn btn-secondary btn-full">Clear Mistakes</button>
+        </div>
+
+        <div class="revision-card" onclick="app.startRevision('difficult')">
+          <div class="revision-icon">🧠</div>
+          <h3>Hard Questions Pack</h3>
+          <p id="rev-count-difficult">0 Questions Saved</p>
+          <button class="btn btn-secondary btn-full">Challenge Yourself</button>
+        </div>
+
+        <div class="revision-card" onclick="app.startRevision('random')">
+          <div class="revision-icon">🎲</div>
+          <h3>Random Practice Pack</h3>
+          <p>Generates a mixed set of 10 questions across all modules.</p>
+          <button class="btn btn-secondary btn-full">Generate Pack</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH VIEW -->
+    <section id="view-search" class="viewport-section">
+      <div class="section-title-wrapper">
+        <h1>Global Questions Database</h1>
+        <p>Quickly search questions by ID, keywords, terminology, Arabic root, or topic.</p>
+      </div>
+
+      <div class="search-bar-container">
+        <input type="text" class="search-input" id="search-query-input" placeholder="Type topic, keyword or question ID (e.g., S1Q1)...">
+      </div>
+
+      <div class="search-results-list" id="search-results-output">
+        <p class="empty-list-msg">Enter a keyword to start searching through sections.</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section id="view-settings" class="viewport-section">
+      <div class="section-title-wrapper">
+        <h1>Platform Settings</h1>
+        <p>Manage local data backup, audio preferences, and reset progress parameters.</p>
+      </div>
+
+      <div class="settings-container">
+        <div class="settings-card">
+          <h3>Sound Effects</h3>
+          <div class="setting-row">
+            <span>Play interactive sounds on correct/incorrect answers</span>
+            <label class="switch">
+              <input type="checkbox" id="settings-audio-toggle" checked>
+              <span class="slider-round"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3>Progress Backup & Sync</h3>
+          <p>Export all streak stats, XP levels, and bookmarks into a text file or import one back.</p>
+          <div class="backup-actions">
+            <button class="btn btn-secondary" id="settings-export-btn">Export Profile Data</button>
+            <button class="btn btn-primary" id="settings-import-btn">Import Profile Data</button>
+            <input type="file" id="settings-file-picker" style="display:none;" accept=".json">
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <h3 class="text-danger">Danger Zone</h3>
+          <p>This action permanently clears all user points, levels, bookmarks and streaks stored on this browser.</p>
+          <button class="btn btn-danger" id="settings-reset-btn">Reset All Arena Progress</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORT PANEL / SCORE MODAL -->
+    <section id="view-report" class="viewport-section">
+      <div class="report-box">
+        <div class="report-header">
+          <span class="report-trophy">🏅</span>
+          <h1 id="report-title">Quiz Completed!</h1>
+          <p id="report-subtitle">Here is an analysis of your response patterns.</p>
+        </div>
+
+        <div class="report-score-panel">
+          <div class="score-circle">
+            <span class="score-percentage" id="report-accuracy">0%</span>
+            <span class="score-label">Accuracy Score</span>
+          </div>
+          <div class="report-stats">
+            <div class="stat-row">
+              <span>XP Earned:</span>
+              <strong id="report-xp">+0 XP</strong>
+            </div>
+            <div class="stat-row">
+              <span>Correct Answers:</span>
+              <strong id="report-correct">0 / 0</strong>
+            </div>
+            <div class="stat-row">
+              <span>Time Taken:</span>
+              <strong id="report-time">00:00</strong>
+            </div>
+            <div class="stat-row">
+              <span>Streak Bonus:</span>
+              <strong id="report-streak">Lv Bonus</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card" id="report-mistakes-section" style="display:none;">
+          <h3>Review Your Mistakes</h3>
+          <div class="mistakes-review-list" id="report-mistakes-list">
+            <!-- Mistake cards populated on finish -->
+          </div>
+        </div>
+
+        <div class="report-actions">
+          <button class="btn btn-primary" id="report-home-btn">Return to Dashboard</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modular Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
